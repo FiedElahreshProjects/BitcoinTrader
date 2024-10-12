@@ -81,3 +81,4 @@ coverage/              # Code coverage folder
 
 .idea/
 Backend/.env
+.env
