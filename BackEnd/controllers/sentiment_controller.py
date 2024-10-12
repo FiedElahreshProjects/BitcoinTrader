@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from pydantic import BaseModel
 from typing import List
 from datetime import date
@@ -14,6 +15,56 @@ class DailySentiment(BaseModel):
     positive_score: float = 0
     neutral_score: float = 0
     negative_score: float = 0
+
+class RedditPost(BaseModel):
+    title: str
+    body: str
+    created: date  # Use a string to store the formatted date
+    score: int
+
+class RedditPostsRequest(BaseModel):
+    posts: List[RedditPost]
+
+# Instantiate the VADER sentiment analyzer
+analyzer = SentimentIntensityAnalyzer()
+
+@router.post("/calculate_sentiment/")
+def calculate_sentiment(data: RedditPostsRequest):
+    weighted_scores = []
+    total_reddit_score = 0
+
+    for post in data.posts:
+        compound_score = analyzer.polarity_scores(f"{post.title} {post.body}")["compound"]
+        weighted_score = compound_score * post.score
+        weighted_scores.append(weighted_score)
+        total_reddit_score += post.score
+
+    if(total_reddit_score > 0):
+        weighted_compound_score = sum(weighted_scores) / total_reddit_score
+    else:
+        weighted_compound_score = 0
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        query = """
+        INSERT INTO daily_sentiment (date, compound_score)
+        VALUES (%s, %s)
+        RETURNING *;
+        """
+        values = (data.posts[0].created, weighted_compound_score)
+        cursor.execute(query, values)
+        result = cursor.fetchone()
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=400, detail=f"Failed to store sentiment score: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return {"average_compound_score": round(weighted_compound_score, 5), "stored_record": result}
+
 
 @router.post("/daily-sentiment/")
 def create_daily_sentiment(sentiment: DailySentiment):

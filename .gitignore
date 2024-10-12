@@ -29,6 +29,11 @@ pip-log.txt            # pip log
 venv/                  # Virtual environment folder
 .venv/                 # Virtual environment folder
 
+# FastAPI
+instance/              # Flask instance folder (used for local development)
+*.env                  # Environment files
+*.env.*                # Custom environment files
+
 # Node.js (React frontend)
 node_modules/          # Dependency directory
 npm-debug.log*         # npm debug logs
@@ -79,5 +84,4 @@ coverage/              # Code coverage folder
 /shelf/
 /workspace.xml
 
-.idea/
 .env
