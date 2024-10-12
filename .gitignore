@@ -80,5 +80,4 @@ coverage/              # Code coverage folder
 /workspace.xml
 
 .idea/
-Backend/.env
 .env
