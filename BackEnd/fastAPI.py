@@ -29,7 +29,7 @@ def get_latest_reddit_posts(subreddit: str = Query(..., description="Subreddit n
     seven_days_ago = current_time - (7 * 24 * 60 * 60)  # Subtract 7 days (in seconds)
 
     # Fetch the latest 100 posts from the specified subreddit
-    for post in subreddit_obj.new(limit=1000):
+    for post in subreddit_obj.new(limit=1100):
         # Filter only posts created in the last 7 days
         if post.created_utc >= seven_days_ago:
             posts.append({
