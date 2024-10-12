@@ -23,5 +23,5 @@ CREATE TABLE weekly_trade_history (
     price DECIMAL(10, 2) NOT NULL,
     quantity DECIMAL(10, 4) NOT NULL,
     profit_loss DECIMAL(10, 2),
-    decision_date DATE NOT NULL
+    decision_date DATE NOT NULL,
 );
