@@ -1,0 +1,78 @@
+# General
+.env                   # Environment variables
+.DS_Store              # macOS specific files
+Thumbs.db              # Windows specific files
+
+# Python (FastAPI backend)
+__pycache__/           # Python cache
+*.py[cod]              # Compiled Python files
+*.sqlite3              # SQLite database files
+*.db                   # Database files
+*.log                  # Log files
+*.pot                  # Translation template files
+*.pyo                  # Optimized Python files
+*.pyd                  # Compiled Python files for Windows
+*.egg-info/            # Egg info
+*.eggs/                # Egg directories
+dist/                  # Distribution files
+build/                 # Build artifacts
+*.egg                  # Egg files
+pip-log.txt            # pip log
+*.cover                # Coverage files
+*.py,cover             # Coverage files
+.hypothesis/           # Hypothesis files
+
+# Virtual Environments
+venv/                  # Virtual environment folder
+.venv/                 # Virtual environment folder
+
+# FastAPI
+instance/              # Flask instance folder (used for local development)
+*.env                  # Environment files
+*.env.*                # Custom environment files
+
+# Node.js (React frontend)
+node_modules/          # Dependency directory
+npm-debug.log*         # npm debug logs
+yarn-debug.log*        # Yarn debug logs
+yarn-error.log*        # Yarn error logs
+
+# React Build Files
+frontend/build         # React production build output
+frontend/.cache/       # Cache directory
+frontend/coverage/     # Code coverage reports
+
+# Editor-specific files
+.vscode/               # VSCode settings
+.idea/                 # IntelliJ IDEA settings
+*.swp                  # Vim swap files
+*.swo                  # Vim swap files
+
+# Logs and Temporary Files
+*.log                  # Log files
+logs/                  # Log directory
+tmp/                   # Temporary files
+debug.log              # npm error log
+*.bak                  # Backup files
+
+# Build Artifacts
+frontend/.next/        # Next.js build output
+frontend/out/          # Static export for Next.js
+frontend/.parcel-cache # Parcel cache
+frontend/dist/         # Webpack and other build tools output
+
+# Testing and Coverage
+.coverage              # Coverage reports
+coverage/              # Code coverage folder
+*.cover                # Coverage files
+
+# Ignore anything related to deployments
+*.zip                  # Archived files
+*.tar.gz               # Archived files
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints     # Jupyter notebook checkpoints
+
+# Default ignored files
+/shelf/
+/workspace.xml
