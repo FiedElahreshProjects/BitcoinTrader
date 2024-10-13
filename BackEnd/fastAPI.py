@@ -1,4 +1,3 @@
-import asyncio
 from fastapi import FastAPI, Query
 from contextlib import asynccontextmanager
 import praw
@@ -10,7 +9,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from BackEnd.controllers import sentiment_controller
 from BackEnd.tasks.trading import autonomous_trading_logic
 from BackEnd.tasks.data_collection import daily_data_collection
-
 
 load_dotenv()
 
@@ -27,8 +25,8 @@ scheduler = BackgroundScheduler()
 async def lifespan(app: FastAPI):
     # Load the ML model
     # Schedule the trading logic to run every minute
-    scheduler.add_job(lambda: asyncio.run(autonomous_trading_logic()), 'interval', hours=1)
-    scheduler.add_job(lambda: asyncio.run(daily_data_collection), 'interval', days=1)
+    scheduler.add_job(autonomous_trading_logic, 'interval', hours=1)
+    scheduler.add_job(daily_data_collection, 'interval', days=1)
     scheduler.start()
     yield
     # Clean up the ML models and release the resources

@@ -5,6 +5,7 @@ import pandas as pd
 import praw
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from datetime import datetime
+<<<<<<< HEAD
 from datetime import timedelta
 
 # Import the calculateMovingAverage and calculateRSI functions from utils
@@ -63,3 +64,14 @@ async def daily_data_collection():
 # Running the async function
 if __name__ == "__main__":
     asyncio.run(daily_data_collection())
+=======
+import os
+from BackEnd.utils.reddit_data_analysis import reddit_data_analysis
+
+def daily_data_collection():
+    # Example data collection logic
+    print(f"Daily data collection completed on {datetime.now()}")
+    # Add data collection logic here
+
+
+>>>>>>> b6aa94f83e51a4ce6acdc1142d687b1ed4291bed
