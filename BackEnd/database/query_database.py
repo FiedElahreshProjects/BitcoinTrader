@@ -111,14 +111,76 @@ def get_technical_data(days: int):
         if conn:
             conn.close()
 
+def get_historical_sentiment_by_date(date: datetime, days: int = 7):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        date = date.strftime('%Y-%m-%d')
+        
+        query = f"""
+        SELECT date, compound_score 
+        FROM daily_sentiment
+        WHERE date <= %s
+        ORDER BY date DESC 
+        LIMIT %s;
+        """
+        
+        cursor.execute(query, (date, days))
+        rows = cursor.fetchall()
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(rows, columns=['date', 'compound_score'])
+        return df
 
-def record_trade_decision(action, last_trade, initial_capital=100000):
+    except Exception as e:
+        print(f"Error fetching sentiment data: {e}")
+        return pd.DataFrame()  # Return an empty DataFrame if there's an error
+
+    finally:
+        # Ensure the cursor and connection are closed properly
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def get_technical_by_date(current_date: datetime, days: int):
     conn = get_connection()
     cursor = conn.cursor()
-    date = datetime.today().strftime("%Y-%m-%d")
+
+    try:
+        query = f"""
+        SELECT date, closing_price, sma_7, sma_21, rsi 
+        FROM daily_technical_analysis
+        WHERE date <= %s
+        ORDER BY date DESC 
+        LIMIT %s;
+        """
+        
+        cursor.execute(query, (current_date.strftime('%Y-%m-%d'), days))
+        rows = cursor.fetchall()
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(rows, columns=['date', 'closing_price', 'sma_7', 'sma_21', 'rsi'])
+        return df
+
+    except Exception as e:
+        print(f"Error fetching technical data: {e}")
+        return pd.DataFrame()  # Return an empty DataFrame if there's an error
+
+    finally:
+        # Ensure the cursor and connection are closed properly
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+def record_trade_decision(action, date, last_trade, initial_capital=100000):
+    conn = get_connection()
+    cursor = conn.cursor()
     week_start_date = (datetime.today() - timedelta(days=7)).strftime("%Y-%m-%d")
 
-    today_technical_data = compute_all()
+    today_technical_data = compute_all(date)
     current_price = today_technical_data['close']
     
     # Fetch the last trade to get the previous cumulative P/L and capital

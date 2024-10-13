@@ -10,9 +10,9 @@ def get_technical_trade_signal(technical_data):
     sma_7_previous = technical_data['sma_7'].iloc[-2]
     sma_21_previous = technical_data['sma_21'].iloc[-2]
     
-    # Calculate sensitive RSI thresholds
-    buy_rsi_threshold = 45  # Buy when RSI is slightly oversold
-    sell_rsi_threshold = 55  # Sell when RSI is slightly overbought
+    # Calculate more sensitive RSI thresholds
+    buy_rsi_threshold = 48  # Increased sensitivity for buy signals
+    sell_rsi_threshold = 52  # Increased sensitivity for sell signals
     
     # Determine Buy Signal
     if latest_rsi < buy_rsi_threshold and sma_7_previous <= sma_21_previous and sma_7_current > sma_21_current:
@@ -27,6 +27,7 @@ def get_technical_trade_signal(technical_data):
         return 'hold'
 
 
+
 def get_sentiment_trade_signal(sentiment_data):
     # Convert compound_score to float to avoid type errors
     sentiment_data['compound_score'] = sentiment_data['compound_score'].astype(float)
@@ -38,22 +39,21 @@ def get_sentiment_trade_signal(sentiment_data):
     # Latest sentiment score
     latest_sentiment = sentiment_data['compound_score'].iloc[-1]
     
-    # Calculate more sensitive Bollinger Bands (1.5 standard deviations)
-    upper_band = mean_sentiment + 1.5 * std_dev_sentiment
-    lower_band = mean_sentiment - 1.5 * std_dev_sentiment
+    # Calculate very sensitive Bollinger Bands (0.5 standard deviations)
+    upper_band = mean_sentiment + 0.5 * std_dev_sentiment
+    lower_band = mean_sentiment - 0.5 * std_dev_sentiment
 
-    # Calculate a more sensitive z-score threshold (e.g., 0.75)
+    # Calculate a very sensitive z-score threshold (e.g., 0.25)
     z_score = (latest_sentiment - mean_sentiment) / std_dev_sentiment
     
-    # Define more sensitive thresholds for buy and sell signals
-    buy_z_threshold = 0.75  # Adjusted to be more sensitive for good sentiment
-    sell_z_threshold = -0.75  # Adjusted to be more sensitive for bad sentiment
+    # Define extremely sensitive thresholds for buy and sell signals
+    buy_z_threshold = 0.25  # Very sensitive threshold for buy signals
+    sell_z_threshold = -0.25  # Very sensitive threshold for sell signals
 
-    # Determine trade signal based on reversed logic
+    # Determine trade signal based on highly sensitive thresholds
     if latest_sentiment > upper_band and z_score >= buy_z_threshold:
-        return 'buy'  # Buy when sentiment is high
+        return 'buy'  # Buy on slight positive sentiment
     elif latest_sentiment < lower_band and z_score <= sell_z_threshold:
-        return 'sell'  # Sell when sentiment is low
+        return 'sell'  # Sell on slight negative sentiment
     else:
         return 'hold'
-
