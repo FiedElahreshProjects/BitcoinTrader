@@ -16,6 +16,18 @@ class DailySentiment(BaseModel):
     neutral_score: float = 0
     negative_score: float = 0
 
+class RedditPost(BaseModel):
+    title: str
+    body: str
+    created: date  # Use a string to store the formatted date
+    score: int
+
+class RedditPostsRequest(BaseModel):
+    posts: List[RedditPost]
+
+# Instantiate the VADER sentiment analyzer
+analyzer = SentimentIntensityAnalyzer()
+
 @router.get("/daily-sentiment-by-date/", response_model=DailySentiment)
 def get_daily_sentiment_by_date(query_date: date = Query(..., description="The date to fetch sentiment data for")):
     conn = get_connection()
@@ -23,6 +35,7 @@ def get_daily_sentiment_by_date(query_date: date = Query(..., description="The d
     try:
         query = "SELECT * FROM daily_sentiment WHERE date = %s"
         cursor.execute(query, (query_date,))
+        print("boom")
         result = cursor.fetchone()
 
         if result is None:
@@ -42,36 +55,6 @@ def get_daily_sentiment_by_date(query_date: date = Query(..., description="The d
     finally:
         cursor.close()
         conn.close()
-
-from fastapi import APIRouter, HTTPException
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from pydantic import BaseModel
-from typing import List
-from datetime import date
-from BackEnd.database.database import get_connection
-
-# Create a router instance for the sentiment endpoints
-router = APIRouter()
-
-# Define the Pydantic model for request validation
-class DailySentiment(BaseModel):
-    date: date
-    compound_score: float
-    positive_score: float = 0
-    neutral_score: float = 0
-    negative_score: float = 0
-
-class RedditPost(BaseModel):
-    title: str
-    body: str
-    created: date  # Use a string to store the formatted date
-    score: int
-
-class RedditPostsRequest(BaseModel):
-    posts: List[RedditPost]
-
-# Instantiate the VADER sentiment analyzer
-analyzer = SentimentIntensityAnalyzer()
 
 @router.post("/calculate_sentiment/")
 def calculate_sentiment(data: RedditPostsRequest):
