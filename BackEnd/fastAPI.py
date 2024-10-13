@@ -1,12 +1,16 @@
+import asyncio
 from fastapi import FastAPI, Query
+from contextlib import asynccontextmanager
 import praw
 import os
 from dotenv import load_dotenv
 import time
 from datetime import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
 from BackEnd.controllers import sentiment_controller
+from BackEnd.tasks.trading import autonomous_trading_logic
+from BackEnd.tasks.data_collection import daily_data_collection
 
-app = FastAPI()
 
 load_dotenv()
 
@@ -15,6 +19,22 @@ reddit = praw.Reddit(
     client_secret=os.getenv("CLIENT_SECRET"),
     user_agent=os.getenv("USER_AGENT")
 )
+
+scheduler = BackgroundScheduler()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Load the ML model
+    # Schedule the trading logic to run every minute
+    scheduler.add_job(lambda: asyncio.run(autonomous_trading_logic()), 'interval', hours=1)
+    scheduler.add_job(lambda: asyncio.run(daily_data_collection), 'interval', days=1)
+    scheduler.start()
+    yield
+    # Clean up the ML models and release the resources
+    scheduler.shutdown()
+
+app = FastAPI(lifespan=lifespan)
 
 # Include the router from the sentiment controller
 app.include_router(sentiment_controller.router)
