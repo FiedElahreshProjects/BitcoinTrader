@@ -62,7 +62,7 @@ def load_sentiment():
 
 
 def seed_sentiment_data():
-    # load_sentiment()
+    load_sentiment()
     
     # Define the date range from 2021-02-01 to the end of 2022
     start_date = "2022-04-01"
