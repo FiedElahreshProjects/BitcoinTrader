@@ -20,6 +20,7 @@ interface ChartData {
   }[];
 }
 
+
 const SentimentPieChart: React.FC<{ selectedDate: string }> = ({ selectedDate }) => {
   const [chartData, setChartData] = useState<ChartData>({
     labels: ['Positive', 'Neutral', 'Negative'],
@@ -31,30 +32,36 @@ const SentimentPieChart: React.FC<{ selectedDate: string }> = ({ selectedDate })
     ],
   });
 
-  useEffect(() => {
-    if (selectedDate) {
-      // Fetch data from the FastAPI backend for the selected date
-      axios
-        .get<SentimentData>(`http://localhost:8000/daily-sentiment/?query_date=${selectedDate}`)
-        .then((response) => {
-          const { positive_score, neutral_score, negative_score } = response.data;
+  //create an async function
+  const getDate = async () =>{
+    if(selectedDate){
+      try{
+        const { data } = await axios.post<SentimentData>(`http://localhost:8000/daily-sentiment-by-date/`, {date: selectedDate})
+        console.log(data)
 
-          // Set the chart data using the response from the API
-          setChartData({
-            labels: ['Positive', 'Neutral', 'Negative'],
-            datasets: [
-              {
-                data: [positive_score, neutral_score, negative_score],
-                backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
-              },
-            ],
-          });
-        })
-        .catch((error) => {
-          console.error('Error fetching sentiment data:', error);
+        setChartData({
+          labels: ['Positive', 'Neutral', 'Negative'],
+          datasets: [
+            {
+              data: [data.positive_score, data.neutral_score, data.negative_score],
+              backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
+            },
+          ],
         });
+      }catch(error){
+        console.error('Error fetching sentiment data:', error);
+      }
     }
+  }
+
+  useEffect(() => {
+
+    getDate();
   }, [selectedDate]);
+
+  useEffect(() =>{
+    console.log(chartData)
+  })
 
   return (
     <div style={{ width: '100%', height: '400px' }}>
