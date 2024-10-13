@@ -35,7 +35,6 @@ def get_daily_sentiment_by_date(query_date: date = Query(..., description="The d
     try:
         query = "SELECT * FROM daily_sentiment WHERE date = %s"
         cursor.execute(query, (query_date,))
-        print("boom")
         result = cursor.fetchone()
 
         if result is None:
