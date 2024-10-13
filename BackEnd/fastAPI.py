@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import praw
 import os
@@ -20,7 +21,6 @@ reddit = praw.Reddit(
 
 scheduler = BackgroundScheduler()
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the ML model
@@ -33,6 +33,20 @@ async def lifespan(app: FastAPI):
     scheduler.shutdown()
 
 app = FastAPI(lifespan=lifespan)
+
+# Configure CORS
+origins = [
+    "http://localhost:5173",  # The origin where your React app is running
+    "http://localhost:8000",  # Commonly used dev server port (add if using this port)
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allow requests from specified origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 # Include the router from the sentiment controller
 app.include_router(sentiment_controller.router)
