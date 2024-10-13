@@ -1,14 +1,13 @@
-def calculate_moving_average(prices, period):
-    """
-    Calculate the simple moving average over the specified period.
-    
-    Args:
-        prices (list of float): List of prices.
-        period (int): The number of prices to average.
+import pandas as pd
 
-    Returns:
-        float: The moving average, or None if there aren't enough data points.
+def calculateMovingAverage(df):
     """
-    if len(prices) < period:
-        return None  # Not enough data to calculate moving average
-    return sum(prices[-period:]) / period
+    Calculates the 7-day and 21-day moving averages using the given DataFrame.
+    """
+    df['SMA_7'] = df['close'].rolling(window=7).mean()
+    df['SMA_21'] = df['close'].rolling(window=21).mean()
+
+    sma_7 = df.iloc[-1]['SMA_7']
+    sma_21 = df.iloc[-1]['SMA_21']
+
+    return sma_7, sma_21

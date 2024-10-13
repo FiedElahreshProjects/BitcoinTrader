@@ -1,35 +1,20 @@
-def calculate_rsi(prices, period=14):
+import pandas as pd
+
+def calculateRSI(df, period=14):
     """
-    Calculate the Relative Strength Index (RSI) over the specified period.
-    
-    Args:
-        prices (list of float): List of prices.
-        period (int): The period over which to calculate RSI, typically 14.
-
-    Returns:
-        float: The RSI value.
+    Calculates the RSI (Relative Strength Index) using the given DataFrame.
     """
-    if len(prices) < period:
-        return None  # Not enough data to calculate RSI
+    df['diff'] = df['close'].diff(1)
 
-    gains = []
-    losses = []
+    df['gain'] = df['diff'].apply(lambda x: x if x > 0 else 0)
+    df['loss'] = df['diff'].apply(lambda x: -x if x < 0 else 0)
 
-    for i in range(1, len(prices)):
-        change = prices[i] - prices[i - 1]
-        if change > 0:
-            gains.append(change)
-        else:
-            losses.append(abs(change))
+    avg_gain = df['gain'].rolling(window=period, min_periods=1).mean()
+    avg_loss = df['loss'].rolling(window=period, min_periods=1).mean()
 
-    # Average the gains and losses over the specified period
-    average_gain = sum(gains[-period:]) / period if gains else 0
-    average_loss = sum(losses[-period:]) / period if losses else 0
+    rs = avg_gain / avg_loss
+    df['RSI'] = 100 - (100 / (1 + rs))
 
-    # Prevent division by zero for average_loss
-    if average_loss == 0:
-        return 100  # If no losses, RSI is 100 (strongly overbought)
-    
-    rs = average_gain / average_loss
-    rsi = 100 - (100 / (1 + rs))
-    return rsi
+    rsi_value = df.iloc[-1]['RSI']
+
+    return rsi_value
