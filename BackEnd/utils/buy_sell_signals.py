@@ -15,11 +15,11 @@ def get_technical_trade_signal(technical_data):
     sell_rsi_threshold = 52  # Increased sensitivity for sell signals
     
     # Determine Buy Signal
-    if latest_rsi < buy_rsi_threshold and sma_7_previous <= sma_21_previous and sma_7_current > sma_21_current:
+    if latest_rsi < buy_rsi_threshold and sma_7_previous >= sma_21_previous:
         return 'buy'
     
     # Determine Sell Signal
-    elif latest_rsi > sell_rsi_threshold and sma_7_previous >= sma_21_previous and sma_7_current < sma_21_current:
+    elif latest_rsi > sell_rsi_threshold and sma_7_current < sma_21_current:
         return 'sell'
     
     # If no signals, hold

@@ -1,28 +1,29 @@
 from datetime import datetime, timedelta
 from BackEnd.database.database import get_connection
-from BackEnd.utils.compute import compute_all
+from BackEnd.utils.compute import compute_all, compute_all_wo_insert
 import pandas as pd
 
 
-def get_last_trade():
+def get_last_trade(trade_date):
     conn = get_connection()
+    # Use RealDictCursor to get results as dictionaries
     cursor = conn.cursor()
     
     try:
         query = """
         SELECT trade_id, week_start_date, action, price, quantity, trade_profit_loss, cumulative_profit_loss, decision_date
         FROM weekly_trade_history
+        WHERE decision_date < %s
         ORDER BY decision_date DESC
         LIMIT 1;
         """
         
-        cursor.execute(query)
+        cursor.execute(query, (trade_date,))
         row = cursor.fetchone()
-        
         
         # Check if any row was returned
         if row:
-            # Convert the row to a dictionary for easy access
+            # row is now a dictionary, so you can access fields by column name
             last_trade = {
                 'trade_id': row['trade_id'],
                 'week_start_date': row['week_start_date'],
@@ -99,11 +100,9 @@ def get_technical_data(days: int):
         # Convert to DataFrame
         df = pd.DataFrame(rows, columns=['date', 'closing_price', 'sma_7', 'sma_21', 'rsi'])
         return df
-
     except Exception as e:
         print(f"Error fetching technical data: {e}")
         return pd.DataFrame()  # Return an empty DataFrame if there's an error
-
     finally:
         # Ensure the cursor and connection are closed properly
         if cursor:
@@ -149,7 +148,7 @@ def get_technical_by_date(current_date: datetime, days: int):
 
     try:
         query = f"""
-        SELECT date, closing_price, sma_7, sma_21, rsi 
+        SELECT *
         FROM daily_technical_analysis
         WHERE date <= %s
         ORDER BY date DESC 
@@ -160,7 +159,7 @@ def get_technical_by_date(current_date: datetime, days: int):
         rows = cursor.fetchall()
         
         # Convert to DataFrame
-        df = pd.DataFrame(rows, columns=['date', 'closing_price', 'sma_7', 'sma_21', 'rsi'])
+        df = pd.DataFrame(rows, columns=['date', 'closing_price', 'sma_7', 'sma_21', 'rsi', 'capital', 'quantity', 'cumulative_profit_loss', 'action', 'price'])
         return df
 
     except Exception as e:
@@ -175,29 +174,37 @@ def get_technical_by_date(current_date: datetime, days: int):
             conn.close()
 
 
-def record_trade_decision(action, date, last_trade, initial_capital=100000):
+def record_trade_decision(action, date, initial_capital=100000):
     conn = get_connection()
     cursor = conn.cursor()
-    week_start_date = (datetime.today() - timedelta(days=7)).strftime("%Y-%m-%d")
+    
+    # Now perform the date arithmetic
+    week_start_date = (date - timedelta(days=7)).strftime("%Y-%m-%d")
+    if(isinstance(date, pd.Timestamp)):
+        date = date.to_pydatetime() # Convert date to string for use later
+        
+    
+    last_trade = get_last_trade(date)
 
-    today_technical_data = compute_all(date)
-    current_price = today_technical_data['close']
+    today_technical_data = compute_all_wo_insert(date)
+    current_price = today_technical_data['closing_price']
+    last_cumulative_pl = last_trade.get('cumulative_profit_loss', 0) if last_trade else 0
+    last_capital = last_trade.get('capital', initial_capital) if last_trade else initial_capital
+    quantity = last_trade.get('quantity', 0) if last_trade else 0
     
-    # Fetch the last trade to get the previous cumulative P/L and capital
-    last_cumulative_pl = last_trade['cumulative_profit_loss'] if last_trade else 0
-    last_capital = last_trade['capital'] if last_trade else initial_capital
-    
-    trade_pl = 0
-    quantity = last_trade['quantity']
     
     # Calculate P/L and updated capital
     if action == 'buy':
-        quantity = (last_capital * 0.10) / current_price
+        print(last_capital)
+        quantity += (last_capital * 0.10) / current_price
         trade_pl = 0  # No P/L on a buy, only when sold
-        capital_after_trade = last_capital - (current_price * quantity)
-        
-    elif action == 'sell' and last_trade and last_trade['action'] == 'buy':
-        quantity = last_trade['quantity']
+        print(last_capital)
+        if(last_capital - (current_price * quantity) >= 0):
+            capital_after_trade = last_capital - (current_price * quantity)
+        else:
+            return
+    elif action == 'sell' and last_trade['action'] == 'buy':
+        quantity -= last_trade['quantity']
         # Calculate P/L based on last buy price
         trade_pl = (current_price - last_trade['price']) * quantity
         capital_after_trade = last_capital + (current_price * quantity) + trade_pl
@@ -213,7 +220,7 @@ def record_trade_decision(action, date, last_trade, initial_capital=100000):
         INSERT INTO weekly_trade_history (week_start_date, action, price, quantity, trade_profit_loss, cumulative_profit_loss, decision_date, capital)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
         """
-        values = (week_start_date, action, current_price, quantity, trade_pl, cumulative_pl, capital_after_trade)
+        values = (week_start_date, action, current_price, quantity, trade_pl, cumulative_pl, date, capital_after_trade)
         cursor.execute(query, values)
         conn.commit()
         print(f"Recorded trade decision: {action} on {date} with P/L: {trade_pl}, cumulative P/L: {cumulative_pl}, and remaining capital: {capital_after_trade}")
@@ -227,3 +234,4 @@ def record_trade_decision(action, date, last_trade, initial_capital=100000):
             cursor.close()
         if conn:
             conn.close()
+

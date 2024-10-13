@@ -115,3 +115,20 @@ def compute_all(date: datetime):
         conn.close()
 
     return {"rsi": rsi, "close": close, "sma_7": sma_7, "sma_21": sma_21}
+
+def compute_all_wo_insert(date: datetime):
+    date = date.strftime("%Y-%m-%d")
+    crypto_data = get_crypto_data(date, period=21)
+
+    # Calculate moving averages
+    sma_7, sma_21 = calculateMovingAverage(crypto_data)
+
+    #get close
+    last_row_close = crypto_data[['close']].tail(1)
+    close = float(last_row_close['close'].values[0])
+
+    # Calculate RSI
+    rsi = calculateRSI(crypto_data)
+
+
+    return {"rsi": rsi, "close": close, "sma_7": sma_7, "sma_21": sma_21, "closing_price": close}

@@ -10,12 +10,10 @@ def seed_model():
 
     # Loop over each date and run the trading logic
     for current_date in date_range:
-        print(current_date)
-        print(f"\nRunning autonomous trading logic for date: {current_date.strftime('%Y-%m-%d')}")
-        try:
-            model_load_to_db(current_date)
-        except Exception as e:
-            print(str(e))
+        # print(current_date)
+        # print(f"\nRunning autonomous trading logic for date: {current_date.strftime('%Y-%m-%d')}")
+
+        model_load_to_db(current_date)
 
 
 
