@@ -4,7 +4,7 @@ import random
 import requests
 from datetime import datetime, timedelta
 from BackEnd.database.database import get_connection
-from BackEnd.tasks.data_collection import reddit_data_analysis
+from BackEnd.utils.reddit_data_analysis import reddit_data_analysis
 
 load_dotenv()
 def seed_sentiment_data():
