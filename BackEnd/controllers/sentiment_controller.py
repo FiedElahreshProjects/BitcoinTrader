@@ -25,29 +25,32 @@ class RedditPost(BaseModel):
 class RedditPostsRequest(BaseModel):
     posts: List[RedditPost]
 
+class DateRequest(BaseModel):
+    date: date
+
 # Instantiate the VADER sentiment analyzer
 analyzer = SentimentIntensityAnalyzer()
 
-@router.get("/daily-sentiment-by-date/", response_model=DailySentiment)
-def get_daily_sentiment_by_date(query_date: date = Query(..., description="The date to fetch sentiment data for")):
+@router.post("/daily-sentiment-by-date/", response_model=DailySentiment)
+def get_daily_sentiment_by_date(date_request: DateRequest):
+    date = date_request.date  # Access the date from the request body
     conn = get_connection()
     cursor = conn.cursor()
     try:
         query = "SELECT * FROM daily_sentiment WHERE date = %s"
-        cursor.execute(query, (query_date,))
+        cursor.execute(query, (date,))
         result = cursor.fetchone()
+        print(result)
 
         if result is None:
             raise HTTPException(status_code=404, detail="No sentiment data found for the given date")
 
-        # Assuming the structure of the query result
-        # result = (id, date, positive_score, neutral_score, negative_score, compound_score)
         return DailySentiment(
-            date=result[1],
-            positive_score=result[2],
-            neutral_score=result[3],
-            negative_score=result[4],
-            compound_score=result[5]
+            date=result['date'],
+            positive_score=result['positive_score'],
+            neutral_score=result['neutral_score'],
+            negative_score=result['negative_score'],
+            compound_score=result['compound_score']
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server Error: {str(e)}")
