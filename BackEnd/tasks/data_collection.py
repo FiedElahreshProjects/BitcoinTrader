@@ -2,6 +2,9 @@ import os
 from datetime import datetime
 import asyncio
 import pandas as pd
+import praw
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from datetime import datetime
 from datetime import timedelta
 
 # Import the calculateMovingAverage and calculateRSI functions from utils
