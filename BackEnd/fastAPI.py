@@ -25,7 +25,7 @@ scheduler = BackgroundScheduler()
 async def lifespan(app: FastAPI):
     # Load the ML model
     # Schedule the trading logic to run every minute
-    scheduler.add_job(autonomous_trading_logic, 'interval', hours=1)
+    scheduler.add_job(autonomous_trading_logic, 'interval', days=1)
     scheduler.add_job(daily_data_collection, 'interval', days=1)
     scheduler.start()
     yield
