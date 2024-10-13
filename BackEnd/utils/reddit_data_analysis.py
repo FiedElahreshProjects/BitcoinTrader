@@ -17,12 +17,12 @@ def get_latest_reddit_posts(subreddit: str):
 
     # Get current time in UNIX timestamp and calculate the time for 7 days ago
     current_time = int(time.time())  # Current time in UNIX timestamp
-    seven_days_ago = current_time - (7 * 24 * 60 * 60)  # Subtract 7 days (in seconds)
+    one_days_ago = current_time - (1 * 24 * 60 * 60)  # Subtract 7 days (in seconds)
 
     # Fetch the latest 100 posts from the specified subreddit
     for post in subreddit_obj.new(limit=1100):
         # Filter only posts created in the last 7 days
-        if post.created_utc >= seven_days_ago:
+        if post.created_utc >= one_days_ago:
             posts.append({
                 "title": post.title,
                 "body": post.selftext,

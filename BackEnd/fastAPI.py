@@ -10,7 +10,6 @@ from BackEnd.controllers import sentiment_controller
 from BackEnd.tasks.trading import autonomous_trading_logic
 from BackEnd.tasks.data_collection import daily_data_collection
 
-
 load_dotenv()
 
 reddit = praw.Reddit(
