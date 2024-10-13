@@ -1,17 +1,12 @@
 import os
 from datetime import datetime
 from datetime import timedelta
-
-from BackEnd.database.database import get_connection
-
-# Import the calculateMovingAverage and calculateRSI functions from utils
-from ..utils.moving_average_utils import calculateMovingAverage
-from ..utils.rsi_utils import calculateRSI
 from alpaca.data.requests import CryptoBarsRequest
 from alpaca.data.timeframe import TimeFrame
 from alpaca.data.historical import CryptoHistoricalDataClient
 from dotenv import load_dotenv
 from BackEnd.utils.reddit_data_analysis import reddit_data_analysis
+from BackEnd.utils.compute import compute_all
 
 load_dotenv()
 api_key = os.getenv("ALPACA_API_KEY")
@@ -49,38 +44,10 @@ def daily_data_collection():
     reddit_data_analysis()
 
     # Fetch the data once
-    target_day = datetime.today().strftime("%Y-%m-%d")
-    crypto_data = get_crypto_data(target_day)
-    last_row_close = crypto_data[['close']].tail(1)
-    close = float(last_row_close['close'].values[0])
-
-    # Calculate the Simple Moving Averages (SMA)
-    sma_7, sma_21 = calculateMovingAverage(crypto_data)
-    print(f"SMA 7: {sma_7}, SMA 21: {sma_21}")
-
-    # Calculate the RSI
-    rsi_value = calculateRSI(crypto_data)
-    print(f"RSI: {rsi_value}")
-
-    conn = get_connection()
-    cursor = conn.cursor()
     try:
-        query = """
-        INSERT INTO daily_technical_analysis (date, closing_price, sma_7, sma_21, rsi)
-        VALUES (%s, %s, %s, %s, %s)
-        RETURNING *;
-        """
-        values = (target_day, close, sma_7, sma_21, rsi_value)
-        cursor.execute(query, values)
-        result = cursor.fetchone()
-        print(result)
-        conn.commit()
+        compute_all(datetime.today())
     except Exception as e:
-        conn.rollback()
-        raise Exception(f"Failed to store sentiment score: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+        print(e)
 
     print(f"Daily data collection completed on {datetime.now()}")
 

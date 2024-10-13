@@ -1,10 +1,10 @@
-import pandas as pd
 from alpaca.data.requests import CryptoBarsRequest
 from alpaca.data.timeframe import TimeFrame
 from alpaca.data.historical import CryptoHistoricalDataClient
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import os
+from BackEnd.database.database import get_connection
 
 # Load environment variables from .env file
 load_dotenv()
@@ -79,12 +79,39 @@ def calculateRSI(df, period=14):
     return rsi_value
 
 # Fetch data once
-data = get_crypto_data("2024-09-21", period=21)
 
-# Calculate moving averages
-sma_7, sma_21 = calculateMovingAverage(data)
-print(f"SMA 7: {sma_7}, SMA 21: {sma_21}")
+def compute_all(date: datetime):
+    date = date.strftime("%Y-%m-%d")
+    crypto_data = get_crypto_data(date, period=21)
 
-# Calculate RSI
-rsi = calculateRSI(data)
-print(f"RSI: {rsi}")
+    # Calculate moving averages
+    sma_7, sma_21 = calculateMovingAverage(crypto_data)
+
+    #get close
+    last_row_close = crypto_data[['close']].tail(1)
+    close = float(last_row_close['close'].values[0])
+
+    # Calculate RSI
+    rsi = calculateRSI(crypto_data)
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        query = """
+        INSERT INTO daily_technical_analysis (date, closing_price, sma_7, sma_21, rsi)
+        VALUES (%s, %s, %s, %s, %s)
+        RETURNING *;
+        """
+        values = (date, close, sma_7, sma_21, rsi)
+        cursor.execute(query, values)
+        result = cursor.fetchone()
+        print(result)
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        raise Exception(f"Failed to store technical data: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+    return {"rsi": rsi, "close": close, "sma_7": sma_7, "sma_21": sma_21}
