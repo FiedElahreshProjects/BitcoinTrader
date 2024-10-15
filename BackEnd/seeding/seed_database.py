@@ -4,20 +4,26 @@ from dotenv import load_dotenv
 from BackEnd.utils.sentiment_utils import calculate_sentiment_wscore
 from BackEnd.utils.compute import compute_all
 
+
 load_dotenv()
 
-file_path = '/Users/avnoorludhar/Desktop/Bitcoin_tweets.csv'
-chunk_size = 100000  # Adjust chunk size based on memory limitations
+FILE_PATH = '/Users/avnoorludhar/Desktop/Bitcoin_tweets.csv'
+CHUNK_SIZE = 100000  # Adjust chunk size based on memory limitations
+SKIP_CHUNK = 0
+START_ROW = SKIP_CHUNK * CHUNK_SIZE
+#Set engine to python if an error with buffer occurs
+ENGINE = 'c'
+MEMORY = False
 
 def load_sentiment():
 # Track overflow posts from the previous chunk
     overflow_posts = []
 
     # Load data in chunks
-    for i, chunk in enumerate(pd.read_csv(file_path, chunksize=chunk_size, low_memory=False)):
-        if(i >= 45):
+    for i, chunk in enumerate(pd.read_csv(FILE_PATH, skiprows=range(1, START_ROW), chunksize=CHUNK_SIZE, low_memory=MEMORY, on_bad_lines='skip', engine=ENGINE)):
+        if(i >= 60):
             break
-        print(f"Processing chunk {i + 1}...")
+        print(f"Processing chunk {SKIP_CHUNK + i + 1}...")
 
         # Convert the date column to datetime and drop invalid dates
         chunk['date'] = pd.to_datetime(chunk['date'], errors='coerce')

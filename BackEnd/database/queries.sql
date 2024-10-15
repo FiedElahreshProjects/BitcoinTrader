@@ -18,10 +18,10 @@ CREATE TABLE daily_technical_analysis (
 
 CREATE TABLE weekly_trade_history (
     trade_id SERIAL PRIMARY KEY,
-    week_start_date DATE NOT NULL,
     action VARCHAR(10) NOT NULL CHECK (action IN ('buy', 'sell', 'hold')),
     price DECIMAL(10, 2) NOT NULL,
     quantity DECIMAL(10, 4) NOT NULL,
+    avg_buy_price DECIMAL(10, 2),
     trade_profit_loss DECIMAL(10, 2),          -- P/L for the individual trade
     cumulative_profit_loss DECIMAL(10, 2),     -- Total P/L up to and including this trade
     decision_date DATE NOT NULL,

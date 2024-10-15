@@ -12,7 +12,6 @@ load_dotenv()
 api_key = os.getenv("ALPACA_API_KEY")
 api_secret = os.getenv("ALPACA_SECRET")
 
-# Fetch crypto data asynchronously
 def get_crypto_data(target_day, period=21):
 
     client = CryptoHistoricalDataClient(api_key, api_secret)
@@ -53,5 +52,5 @@ def daily_data_collection():
 
 
 
-if __name__ == "__main__":
-    daily_data_collection()
+# if __name__ == "__main__":
+#     daily_data_collection()

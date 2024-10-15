@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import os
 from BackEnd.database.database import get_connection
+from pydantic import BaseModel
 
 # Load environment variables from .env file
 load_dotenv()
@@ -14,6 +15,14 @@ api_key = os.getenv("ALPACA_API_KEY")
 api_secret = os.getenv("ALPACA_SECRET")
 
 client = CryptoHistoricalDataClient(api_key, api_secret)
+
+class TechnicalIndicators(BaseModel):
+    rsi: float
+    close: float
+    sma_7: float
+    sma_21: float
+    closing_price: float
+
 
 def get_crypto_data(target_day, period=21):
     """
@@ -80,14 +89,14 @@ def calculateRSI(df, period=14):
 
 # Fetch data once
 
-def compute_all(date: datetime):
+def compute_all(date: datetime) -> TechnicalIndicators:
     date = date.strftime("%Y-%m-%d")
     crypto_data = get_crypto_data(date, period=21)
 
     # Calculate moving averages
     sma_7, sma_21 = calculateMovingAverage(crypto_data)
 
-    #get close
+    # Get close
     last_row_close = crypto_data[['close']].tail(1)
     close = float(last_row_close['close'].values[0])
 
@@ -114,21 +123,22 @@ def compute_all(date: datetime):
         cursor.close()
         conn.close()
 
-    return {"rsi": rsi, "close": close, "sma_7": sma_7, "sma_21": sma_21}
+    # Return a Pydantic model instance
+    return TechnicalIndicators(rsi=rsi, close=close, sma_7=sma_7, sma_21=sma_21, closing_price=close)
 
-def compute_all_wo_insert(date: datetime):
+def compute_all_wo_insert(date: datetime) -> TechnicalIndicators:
     date = date.strftime("%Y-%m-%d")
     crypto_data = get_crypto_data(date, period=21)
 
     # Calculate moving averages
     sma_7, sma_21 = calculateMovingAverage(crypto_data)
 
-    #get close
+    # Get close
     last_row_close = crypto_data[['close']].tail(1)
     close = float(last_row_close['close'].values[0])
 
     # Calculate RSI
     rsi = calculateRSI(crypto_data)
 
-
-    return {"rsi": rsi, "close": close, "sma_7": sma_7, "sma_21": sma_21, "closing_price": close}
+    # Return a Pydantic model instance
+    return TechnicalIndicators(rsi=rsi, close=close, sma_7=sma_7, sma_21=sma_21, closing_price=close)
