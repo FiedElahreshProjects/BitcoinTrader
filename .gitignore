@@ -7,7 +7,7 @@ Thumbs.db              # Windows specific files
 **/.env.*              # Custom environment files (e.g., .env.production in any directory)
 
 # Python (FastAPI backend)
-**/__pycache__/        # Python cache in all directories
+__pycache__/       # Python cache in all directories
 *.py[cod]              # Compiled Python files
 *.sqlite3              # SQLite database files
 *.db                   # Database files
