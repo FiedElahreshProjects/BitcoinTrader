@@ -181,64 +181,76 @@ def get_technical_by_date(current_date: datetime, days: int):
         if conn:
             conn.close()
 
+from datetime import datetime
+from typing import Tuple, Optional
+import pandas as pd
 
-def record_trade_decision(action: str, date: datetime, initial_capital=100000):
-    conn = get_connection()
-    cursor = conn.cursor()
-    
+# Assume other necessary imports are here (e.g., compute_all_wo_insert, get_last_trade, get_connection)
+
+def calculate_trade_values(action: str, date: datetime, initial_capital=100000) -> Optional[Tuple[str, float, float, float, float, datetime, float, float]]:
+    # Retrieve the technical data and last trade
     date_technical_data = compute_all_wo_insert(date)
-    current_price = date_technical_data.closing_price  # No rounding here yet
-
+    current_price = date_technical_data.closing_price
     last_trade = get_last_trade(date)
     
-    # Initialize variables based on the last trade or set default values
+    # Initialize variables
     last_cumulative_pl = last_trade.cumulative_profit_loss if last_trade else 0
     last_capital = last_trade.capital if last_trade else initial_capital
     quantity = last_trade.quantity if last_trade else 0
     avg_buy_price = last_trade.avg_buy_price if last_trade else 0
     trade_pl = 0
     capital_after_trade = last_capital
-    
+
     # Buy logic with average price calculation
     if action == 'buy':
-        buy_quantity = (last_capital * 0.10) / current_price  # Full precision quantity for buy
+        buy_quantity = (last_capital * 0.10) / current_price
         buy_cost = current_price * buy_quantity
-        
         if last_capital >= buy_cost:
-            # Update the weighted average price of BTC
             total_cost = (avg_buy_price * quantity) + buy_cost
             quantity += buy_quantity
-            avg_buy_price = total_cost / quantity  # Update to the new weighted average price
-            
+            avg_buy_price = total_cost / quantity
             capital_after_trade = last_capital - buy_cost
         else:
             print("Insufficient capital for buy action.")
-            return
+            return None
 
     # Sell logic: Sell the entire position
     elif action == 'sell':
         if quantity > 0:
-            # Sell the entire quantity
-            trade_pl = (current_price - avg_buy_price) * quantity  # P/L based on the average price
+            trade_pl = (current_price - avg_buy_price) * quantity
             capital_after_trade = last_capital + (current_price * quantity) + trade_pl
-            
-            # After selling, reset quantity and avg_buy_price to zero since we no longer hold any position
             quantity = 0
             avg_buy_price = 0
         else:
             print("No quantity to sell; cannot execute sell action.")
-            return
+            return None
 
     # Update cumulative profit/loss
-    cumulative_pl = last_cumulative_pl + trade_pl  # Full precision cumulative P/L
+    cumulative_pl = last_cumulative_pl + trade_pl
+
+    # Return all necessary values for the database insert
+    return (action, current_price, quantity, trade_pl, cumulative_pl, date, capital_after_trade, avg_buy_price)
+
+def record_trade_decision(action: str, date: datetime, initial_capital=100000):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Get the calculated values
+    trade_values = calculate_trade_values(action, date, initial_capital)
+    if not trade_values:
+        # If None, print a message and exit
+        print("Trade decision could not be processed.")
+        return
+
+    # Unpack the values for easier readability
+    action, current_price, quantity, trade_pl, cumulative_pl, date, capital_after_trade, avg_buy_price = trade_values
 
     try:
-        # Update database query to include avg_buy_price
+        # Insert into the database
         query = """
         INSERT INTO weekly_trade_history (action, price, quantity, trade_profit_loss, cumulative_profit_loss, decision_date, capital, avg_buy_price)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
         """
-        # Round only when storing in the database
         values = (
             action,
             round(current_price, 2),

@@ -5,7 +5,7 @@ from BackEnd.tasks.trading import model_load_to_db
 def seed_model():
     # Define your start and end dates
     start_date = datetime.strptime("2021-02-12", "%Y-%m-%d")
-    end_date = datetime.strptime("2022-11-21", "%Y-%m-%d")
+    end_date = datetime.strptime("2023-04-21", "%Y-%m-%d")
     date_range = pd.date_range(start=start_date, end=end_date)
 
     # Loop over each date and run the trading logic
