@@ -5,7 +5,7 @@ import axios from 'axios';
 
 interface TechnicalData {
   date: string;
-  closing_value: number;
+  closing_price: number;
 }
 
 interface ChartData {
@@ -33,44 +33,40 @@ export const TechnicalLineChart: React.FC<{ startDate: string; endDate: string }
     ],
   });
 
-useEffect(() => {
-    if (startDate && endDate) {
-      // Fetch data from the FastAPI backend for the given date range
-      axios
-        .get<TechnicalData[]>(`http://localhost:8000/daily-technical-by-date/`, {
-          params: {
-            start_date: startDate,
-            end_date: endDate,
-          },
-        })
+  const getTechnicalData = async () =>{
+    if(startDate && endDate){
+      try{
+        const response = await axios.post<TechnicalData[]>(`http://localhost:8000/daily-technical-by-date/`, {date_start: startDate, date_end: endDate})
+        console.log(response.data)
+        const labels = response.data.map((item) => item.date);
+        const data = response.data.map((item) => item.closing_price);
+        console.log(data)
 
-        .then((response) => {
-          const labels = response.data.map((item) => item.date);
-          const data = response.data.map((item) => item.closing_value);
-
-          // Set the chart data using the response from the API
-          setChartData({
-            labels,
-            datasets: [
-              {
-                label: 'Daily Technical Closing Value',
-                data,
-                borderColor: '#28A745',
-                backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                fill: true,
-              },
-            ],
-          });
-        })
-        
-        .catch((error) => {
-          console.error('Error fetching technical data:', error);
+        // Set the chart data using the response from the API
+        setChartData({
+          labels,
+          datasets: [
+            {
+              label: 'Daily Technical Closing Value',
+              data,
+              borderColor: '#28A745',
+              backgroundColor: 'rgba(40, 167, 69, 0.2)',
+              fill: true,
+            },
+          ],
         });
+      }catch(error){
+        console.log("error fetching data...", error);
+      }
     }
+  }
+
+  useEffect(() => {
+    getTechnicalData();
   }, [startDate, endDate]);
 
   return (
-    <div style={{ width: '80%', height: '500px', margin: '0 auto' }}>
+    <div className="w-full h-full flex items-center justify-center">
       <Line data={chartData} />
     </div>
   );

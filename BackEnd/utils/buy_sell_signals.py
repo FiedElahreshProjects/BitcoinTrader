@@ -6,16 +6,16 @@ def get_technical_trade_signal(technical_data):
     sma_7_current = technical_data['sma_7'].iloc[-1]
     sma_21_current = technical_data['sma_21'].iloc[-1]
     
-    # Get previous day SMA values to detect a crossover
-    sma_7_previous = technical_data['sma_7'].iloc[-2]
-    sma_21_previous = technical_data['sma_21'].iloc[-2]
+    # # Get previous day SMA values to detect a crossover
+    # sma_7_previous = technical_data['sma_7'].iloc[-2]
+    # sma_21_previous = technical_data['sma_21'].iloc[-2]
     
     # Calculate more sensitive RSI thresholds
     buy_rsi_threshold = 48  # Increased sensitivity for buy signals
     sell_rsi_threshold = 52  # Increased sensitivity for sell signals
     
     # Determine Buy Signal
-    if latest_rsi < buy_rsi_threshold and sma_7_previous >= sma_21_previous:
+    if latest_rsi < buy_rsi_threshold and sma_7_current >= sma_21_current:
         return 'buy'
     
     # Determine Sell Signal

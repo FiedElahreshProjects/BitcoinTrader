@@ -53,7 +53,7 @@ def get_daily_sentiment_by_date(date_request: DateRequest):
             compound_score=result['compound_score']
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Server Error: {str(e)}")
+        raise HTTPException(status_code=404, detail=f"{str(e)}")
     finally:
         cursor.close()
         conn.close()

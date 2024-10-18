@@ -34,10 +34,10 @@ def autonomous_trading_logic():
     
     if final_decision == 'buy':
         # Record the buy trade
-        record_trade_decision('buy', technical_data.iloc[0])
+        record_trade_decision('buy', date=datetime.today())
     elif final_decision == 'sell':
         # Record the sell trade
-        record_trade_decision('sell', technical_data.iloc[0])
+        record_trade_decision('sell', date=datetime.today())
     else:
         print("No action taken (hold).")
 
