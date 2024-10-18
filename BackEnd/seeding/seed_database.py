@@ -11,7 +11,7 @@ FILE_PATH = 'C:\\Users\\Fied\\Desktop\\tweets.csv'
 CHUNK_SIZE = 100000  # Adjust chunk size based on memory limitations
 SKIP_CHUNK = 0
 START_ROW = SKIP_CHUNK * CHUNK_SIZE
-#Set engine to python if an error with buffer occurs
+#Set engine to python if an error with buffer occurs and set memory = True
 ENGINE = 'c'
 MEMORY = False
 
