@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import axios, { AxiosError } from "axios";
 import { Pie } from 'react-chartjs-2';
 
@@ -18,7 +18,8 @@ interface ChartData {
   }[];
 }
 
-export const SentimentPieChart: React.FC<{ selectedDate: string }> = ({ selectedDate }) => {
+export const SentimentPieChart: React.FC<{ formatDate: (date:Date) => string}> = ({ formatDate }) => {
+    const [selectedDate, setSelectedDate] = useState<string>('');
     const [chartData, setChartData] = useState<ChartData>({
       labels: ['Positive', 'Neutral', 'Negative'],
       datasets: [
@@ -43,48 +44,79 @@ export const SentimentPieChart: React.FC<{ selectedDate: string }> = ({ selected
       },
     };
   
-    //create an async function
-    const getDate = async () =>{
-      if(selectedDate){
-        try{
-          const { data } = await axios.post<SentimentData>(`http://localhost:8000/daily-sentiment-by-date/`, {date: selectedDate})
-  
-          setChartData({
-            labels: ['Positive', 'Neutral', 'Negative'],
-            datasets: [
-              {
-                data: [data.positive_score, data.neutral_score, data.negative_score],
-                backgroundColor: ['#28A745', '#A9A9A9', '#000000'],
-                borderColor: '#1C2833', // Darker outline to match the background
-                borderWidth: 2, 
-              },
-            ],
-          });
-          setError(null);
-        }catch(error){
-          // Check if the error is an AxiosError and if it has a response with a status code
-          if (axios.isAxiosError(error)) {
-            if (error.response && error.response.status === 404) {
-              setError("Data unavailable");
-            } else {
-              setError("An error occurred");
+      //create an async function
+      const getDate = async () =>{
+        if(selectedDate){
+          try{
+            const { data } = await axios.post<SentimentData>(`http://localhost:8000/daily-sentiment-by-date/`, {date: selectedDate})
+    
+            setChartData({
+              labels: ['Positive', 'Neutral', 'Negative'],
+              datasets: [
+                {
+                  data: [data.positive_score, data.neutral_score, data.negative_score],
+                  backgroundColor: ['#005B41', '#A9A9A9', '#000000'],
+                  borderColor: '#1C2833', // Darker outline to match the background
+                  borderWidth: 2, 
+                },
+              ],
+            });
+            setError(null);
+          }catch(error){
+            // Check if the error is an AxiosError and if it has a response with a status code
+            if (axios.isAxiosError(error)) {
+              if (error.response && error.response.status === 404) {
+                setError("Data unavailable");
+              } else {
+                setError("An error occurred");
+              }
             }
           }
         }
       }
-    }
+
+      const handleDateChange = (event: ChangeEvent<HTMLInputElement>) => {
+          setSelectedDate(event.target.value);
+      };
+      // Calculate recent dates on initial load
+      useEffect(() => {
+        const today = new Date();
+        
+        // Set endDate and selectedDate to yesterday
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 2);
+        
+        // Set startDate to two weeks prior to yesterday
+        const twoWeeksAgo = new Date(yesterday);
+        twoWeeksAgo.setDate(yesterday.getDate() - 14);
+
+        // Set the state
+        setSelectedDate(formatDate(yesterday));
+    }, []);
   
     useEffect(() => {
       getDate();
     }, [selectedDate]);
   
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="w-full h-full flex flex-col items-center gap-2 justify-center">
+        <div className="flex flex-col gap-1 justify-center w-full items-center">
+          <h2 className="text-gray-300 text-xl font-bold">BTC Sentiment</h2>
+          <input
+          type="date"
+          value={selectedDate}
+          onChange={handleDateChange}
+          className="w-fit p-2 rounded mb-6"
+          />
+        </div>
         {error ? (
           <p className="text-red-500">{error}</p>
         ) : (
-          <Pie data={chartData} options={options} />
+          <div className="flex items-center justify-center w-full h-full"> {/* Centering Container */}
+            <Pie data={chartData} options={options}/>
+          </div>
         )}
       </div>
+
     );
   };

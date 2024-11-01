@@ -28,7 +28,7 @@ ChartJS.register(
 
 const App = () => {
   return (
-    <div className='bg-base-100 h-screen w-screen'>
+    <div className='bg-[#121212] h-screen w-screen'>
       <Home />
     </div>
     

@@ -15,7 +15,6 @@ api_secret = os.getenv("ALPACA_SECRET")
 def get_crypto_data(target_day, period=21):
 
     client = CryptoHistoricalDataClient(api_key, api_secret)
-
     end_date = datetime.strptime(target_day, "%Y-%m-%d")
     start_date = end_date - timedelta(days=period + 1)
 
