@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import time
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
-from BackEnd.controllers import sentiment_controller
+from BackEnd.controllers import sentiment_controller, technical_controller, trading_controller
 from BackEnd.tasks.trading import autonomous_trading_logic
 from BackEnd.tasks.data_collection import daily_data_collection
 
@@ -50,6 +50,8 @@ app.add_middleware(
 
 # Include the router from the sentiment controller
 app.include_router(sentiment_controller.router)
+app.include_router(technical_controller.router)
+app.include_router(trading_controller.router)
 
 @app.get("/reddit-posts/")
 def get_latest_reddit_posts(subreddit: str = Query(..., description="Subreddit name to fetch posts from")):

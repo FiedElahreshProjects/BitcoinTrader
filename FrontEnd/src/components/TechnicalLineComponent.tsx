@@ -1,14 +1,15 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
+import { useTradingData } from "../context/TradingDataContext";
 
 
-interface TechnicalData {
+type TechnicalData = {
   date: string;
   closing_price: number;
 }
 
-interface ChartData {
+type ChartData = {
   labels: string[];
   datasets: {
     label: string;
@@ -22,6 +23,8 @@ interface ChartData {
 export const TechnicalLineChart: React.FC<{ formatDate: (date:Date) => string}> = ({ formatDate }) => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+  const { tradeData } = useTradingData();
+  console.log(tradeData);
   const [chartData, setChartData] = useState<ChartData>({
     labels: [],
     datasets: [
@@ -90,7 +93,7 @@ export const TechnicalLineChart: React.FC<{ formatDate: (date:Date) => string}> 
 
   return (
     <div className="w-full h-full flex items-center justify-center gap-6">
-      <div className="flex flex-col gap-1 w-full">
+      <div className="flex flex-col gap-1 w-[29%]">
           <h2 className="text-gray-300 text-xl font-[900]">BTC Closing Price</h2>
           <div className="flex flex-col justify-start">
             <h2 className="text-md mb-4">Select Date Range</h2>
@@ -108,8 +111,9 @@ export const TechnicalLineChart: React.FC<{ formatDate: (date:Date) => string}> 
             />
           </div>
       </div>
-      
-      <Line data={chartData} />
+      <div className="flex items-center justify-center w-[70%] h-full">
+        <Line data={chartData} />
+      </div>
     </div>
   );
 };

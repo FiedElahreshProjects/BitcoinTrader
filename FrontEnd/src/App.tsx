@@ -25,8 +25,8 @@ ChartJS.register(
   Filler
 );
 
-
 const App = () => {
+
   return (
     <div className='bg-[#121212] h-screen w-screen'>
       <Home />

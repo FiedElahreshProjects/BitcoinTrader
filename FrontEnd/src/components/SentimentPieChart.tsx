@@ -1,5 +1,5 @@
 import { useState, useEffect, ChangeEvent } from "react";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { Pie } from 'react-chartjs-2';
 
 interface SentimentData {
@@ -25,7 +25,7 @@ export const SentimentPieChart: React.FC<{ formatDate: (date:Date) => string}> =
       datasets: [
         {
           data: [0, 0, 0], // Initial values
-          backgroundColor: ['#28A745', '#A9A9A9', '#000000'], // Colors for the pie chart
+          backgroundColor: ['#28A745', '#A9A9A9', '#1A1A1A'], // Colors for the pie chart
           borderColor: '#1C2833', // Darker outline to match the background
           borderWidth: 2, 
         },
@@ -55,7 +55,7 @@ export const SentimentPieChart: React.FC<{ formatDate: (date:Date) => string}> =
               datasets: [
                 {
                   data: [data.positive_score, data.neutral_score, data.negative_score],
-                  backgroundColor: ['#005B41', '#A9A9A9', '#000000'],
+                  backgroundColor: ['#005B41', '#A9A9A9', '#1A1A1A'],
                   borderColor: '#1C2833', // Darker outline to match the background
                   borderWidth: 2, 
                 },
@@ -99,7 +99,7 @@ export const SentimentPieChart: React.FC<{ formatDate: (date:Date) => string}> =
     }, [selectedDate]);
   
     return (
-      <div className="w-full h-full flex flex-col items-center gap-2 justify-center">
+      <div className="w-full h-full flex flex-col items-center justify-center">
         <div className="flex flex-col gap-1 justify-center w-full items-center">
           <h2 className="text-gray-300 text-xl font-bold">BTC Sentiment</h2>
           <input
@@ -110,9 +110,9 @@ export const SentimentPieChart: React.FC<{ formatDate: (date:Date) => string}> =
           />
         </div>
         {error ? (
-          <p className="text-red-500">{error}</p>
+          <p className="text-[#E53935]">{error}</p>
         ) : (
-          <div className="flex items-center justify-center w-full h-full"> {/* Centering Container */}
+          <div className="flex items-center justify-center w-full h-full max-h-[280px]"> {/* Centering Container */}
             <Pie data={chartData} options={options}/>
           </div>
         )}

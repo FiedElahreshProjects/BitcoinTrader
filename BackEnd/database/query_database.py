@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Tuple, Optional
 from pydantic import BaseModel
 from BackEnd.database.database import get_connection
 from BackEnd.utils.compute import compute_all_wo_insert
 import pandas as pd
 from typing import Optional
+from datetime import datetime
 
 class Trade(BaseModel):
     action: str
@@ -181,10 +182,6 @@ def get_technical_by_date(current_date: datetime, days: int):
         if conn:
             conn.close()
 
-from datetime import datetime
-from typing import Tuple, Optional
-import pandas as pd
-
 # Assume other necessary imports are here (e.g., compute_all_wo_insert, get_last_trade, get_connection)
 
 def calculate_trade_values(action: str, date: datetime, initial_capital=100000) -> Optional[Tuple[str, float, float, float, float, datetime, float, float]]:
@@ -198,7 +195,7 @@ def calculate_trade_values(action: str, date: datetime, initial_capital=100000) 
     last_capital = last_trade.capital if last_trade else initial_capital
     quantity = last_trade.quantity if last_trade else 0
     avg_buy_price = last_trade.avg_buy_price if last_trade else 0
-    trade_pl = 0
+    trade_pl = 0  # Set to zero explicitly for clarity
     capital_after_trade = last_capital
 
     # Buy logic with average price calculation
@@ -206,6 +203,7 @@ def calculate_trade_values(action: str, date: datetime, initial_capital=100000) 
         buy_quantity = (last_capital * 0.10) / current_price
         buy_cost = current_price * buy_quantity
         if last_capital >= buy_cost:
+            # Calculate total cost for new average price
             total_cost = (avg_buy_price * quantity) + buy_cost
             quantity += buy_quantity
             avg_buy_price = total_cost / quantity
@@ -217,16 +215,17 @@ def calculate_trade_values(action: str, date: datetime, initial_capital=100000) 
     # Sell logic: Sell the entire position
     elif action == 'sell':
         if quantity > 0:
+            # Calculate profit/loss from the sale
             trade_pl = (current_price - avg_buy_price) * quantity
-            capital_after_trade = last_capital + (current_price * quantity) + trade_pl
-            quantity = 0
-            avg_buy_price = 0
+            capital_after_trade = last_capital + (current_price * quantity)  # Only add sale proceeds
+            quantity = 0  # Reset quantity after selling everything
+            avg_buy_price = 0  # Reset avg buy price after selling everything
         else:
             print("No quantity to sell; cannot execute sell action.")
             return None
 
-    # Update cumulative profit/loss
-    cumulative_pl = last_cumulative_pl + trade_pl
+    # Update cumulative profit/loss only for sell action
+    cumulative_pl = last_cumulative_pl + trade_pl if action == 'sell' else last_cumulative_pl
 
     # Return all necessary values for the database insert
     return (action, current_price, quantity, trade_pl, cumulative_pl, date, capital_after_trade, avg_buy_price)
