@@ -12,8 +12,7 @@ const BTC = () =>{
     };
     return (
         <TradingDataProvider>
-            <div className="p-6 lg:grid lg:grid-cols-12 lg:grid-rows-4 gap-6 flex flex-col w-ful h-full">
-                {/* Sidebar on the left for inputs */}
+            <div className="p-6 lg:grid lg:grid-cols-12 lg:grid-rows-4 gap-6 flex flex-col w-full lg:h-full h-fit">
 
                 {/* Line graph for BTC price */}
                 <div className="col-span-8 row-span-2 h-full flex justify-center bg-[#1A1A1A] rounded-xl shadow-lg p-3 items-center">
@@ -34,7 +33,7 @@ const BTC = () =>{
                     <TradingLineChart formatDate={formatDate} />
                 </div>
             </div>
-            <div className='p-6 flex flex-col lg:gap-8 gap-4'>
+            <div className='p-6 flex flex-col lg:gap-8 gap-4 pt-0'>
                 <div className="flex h-full justify-center items-center bg-[#1A1A1A] rounded-xl shadow-lg p-4">
                     <SMALine formatDate={formatDate}/>
                 </div>

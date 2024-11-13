@@ -71,23 +71,23 @@ export const RSILine: React.FC<{ formatDate: (date: Date) => string }> = ({ form
 
   useEffect(() => {
     const today = new Date();
-    const twoWeeksAgo = new Date(today);
-    twoWeeksAgo.setDate(today.getDate() - 14);
+    const sixMonthsAgo = new Date(today);
+    sixMonthsAgo.setDate(today.getDate() - 180);
     setEndDate(formatDate(today));
-    setStartDate(formatDate(twoWeeksAgo));
+    setStartDate(formatDate(sixMonthsAgo));
   }, []);
 
   return (
-    <div className="w-full h-full flex items-center justify-center gap-6">
-      <div className="flex flex-col gap-1 w-[29%]">
+    <div className="w-full h-full flex md:flex-row flex-col md:min-h-[0px] min-h-[300px] items-center justify-center gap-6">
+      <div className="flex flex-col md:items-start items-center gap-1 md:w-[29%] w-full">
         <h2 className="text-gray-300 text-xl font-[900]">BTC RSI</h2>
-        <div className="flex flex-col justify-start">
-          <h2 className="text-md mb-4">Select Date Range</h2>
+        <h2 className="text-md md:mb-4 mb-2">Select Date Range</h2>
+        <div className="flex md:flex-col flex-row md:justify-start md:gap-0 gap-2">
           <input
             type="date"
             value={startDate}
             onChange={handleStartDateChange}
-            className="w-full p-2 rounded mb-4"
+            className="w-full p-2 rounded md:mb-4"
           />
           <input
             type="date"
@@ -97,7 +97,7 @@ export const RSILine: React.FC<{ formatDate: (date: Date) => string }> = ({ form
           />
         </div>
       </div>
-      <div className="flex items-center justify-center w-[70%] h-full">
+      <div className="flex items-center justify-center md:w-[70%] w-full h-full">
         <Line
           data={chartData}
           options={{

@@ -1,4 +1,4 @@
-import { SiBitcoinsv, SiEthereum } from "react-icons/si";
+import { SiBitcoinsv, SiEthereum, SiSolana } from "react-icons/si";
 
 const SideBar = () =>{
     return (
@@ -18,6 +18,12 @@ const SideBar = () =>{
                     <SiEthereum className='scale-[1.6] ml-2 transition-all'/>
                     <p className='text-xl font-bold'>
                         Ethereum
+                    </p>
+                </div>
+                <div className='h-16 flex flex-row items-center justify-between px-3 hover:text-[#005B41]'>
+                    <SiSolana className='scale-[1.6] ml-2 transition-all'/>
+                    <p className='text-xl font-bold'>
+                        Solana
                     </p>
                 </div>
             </div>
