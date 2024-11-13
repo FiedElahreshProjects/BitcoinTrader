@@ -71,3 +71,36 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* targets the entire scroll bar item*/
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; 
+}
+
+/* targets just the background of the scroll bar*/
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #121212; 
+}
+
+/* targets the scrollable part that people think of of the scrollbar*/
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #005B41; 
+  border-radius: 8px; 
+  border: 2px solid #121212; 
+}
+
+/* For Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #005B41 #121212;
+}

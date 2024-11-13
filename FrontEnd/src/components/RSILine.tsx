@@ -1,11 +1,10 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
-import { useTradingData } from "../context/TradingDataContext";
 
 type TechnicalData = {
   date: string;
-  closing_price: number;
+  rsi: number;
 }
 
 type ChartData = {
@@ -19,22 +18,12 @@ type ChartData = {
   }[];
 }
 
-export const TechnicalLineChart: React.FC<{ formatDate: (date: Date) => string }> = ({ formatDate }) => {
+export const RSILine: React.FC<{ formatDate: (date: Date) => string }> = ({ formatDate }) => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const { tradeData } = useTradingData();
-  console.log(tradeData);
   const [chartData, setChartData] = useState<ChartData>({
     labels: [],
-    datasets: [
-      {
-        label: 'Daily Technical Closing Value',
-        data: [],
-        borderColor: '#28A745',
-        backgroundColor: 'rgba(40, 167, 69, 0.2)',
-        fill: true,
-      },
-    ],
+    datasets: [],
   });
 
   const getTechnicalData = async () => {
@@ -48,17 +37,17 @@ export const TechnicalLineChart: React.FC<{ formatDate: (date: Date) => string }
         });
 
         const labels = sortedData.map((item) => item.date);
-        const data = sortedData.map((item) => item.closing_price);
+        const rsiData = sortedData.map((item) => item.rsi);
 
         setChartData({
           labels,
           datasets: [
             {
-              label: 'Daily Technical Closing Value',
-              data,
-              borderColor: '#005B41',
-              backgroundColor: 'rgba(40, 167, 69, 0.2)',
-              fill: true,
+              label: 'RSI',
+              data: rsiData,
+              borderColor: '#005B41', // Orange for SMA 7
+              backgroundColor: 'rgba(255, 165, 0, 0.2)',
+              fill: false,
             },
           ],
         });
@@ -88,20 +77,10 @@ export const TechnicalLineChart: React.FC<{ formatDate: (date: Date) => string }
     setStartDate(formatDate(twoWeeksAgo));
   }, []);
 
-  const calculateMonthDifference = (start: string, end: string) => {
-    const startDt = new Date(start);
-    const endDt = new Date(end);
-    const yearDiff = endDt.getFullYear() - startDt.getFullYear();
-    const monthDiff = endDt.getMonth() - startDt.getMonth();
-    return yearDiff * 12 + monthDiff;
-  };
-
-  const isOverSixMonths = calculateMonthDifference(startDate, endDate) > 6;
-
   return (
     <div className="w-full h-full flex items-center justify-center gap-6">
       <div className="flex flex-col gap-1 w-[29%]">
-        <h2 className="text-gray-300 text-xl font-[900]">BTC Closing Price</h2>
+        <h2 className="text-gray-300 text-xl font-[900]">BTC RSI</h2>
         <div className="flex flex-col justify-start">
           <h2 className="text-md mb-4">Select Date Range</h2>
           <input
@@ -122,18 +101,9 @@ export const TechnicalLineChart: React.FC<{ formatDate: (date: Date) => string }
         <Line
           data={chartData}
           options={{
-            interaction: {
-              mode: isOverSixMonths ? undefined : 'nearest',
-              intersect: !isOverSixMonths,
-            },
-            plugins: {
-              tooltip: {
-                enabled: !isOverSixMonths,
-              },
-            },
             elements: {
               point: {
-                radius: isOverSixMonths ? 0 : 3, // Set radius to 0 if range > 6 months, else 3
+                radius: 0, // Set radius to 0 if range > 6 months, else 3
               },
             },
           }}

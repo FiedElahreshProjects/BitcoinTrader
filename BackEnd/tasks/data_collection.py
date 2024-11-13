@@ -37,7 +37,7 @@ def get_crypto_data(target_day, period=21):
 
 def daily_data_collection():
     # Call both the SMA and RSI functions
-    print(f"Starting daily data collection on {datetime.now()}")
+    # print(f"Starting daily data collection on {datetime.now()}")
 
     reddit_data_analysis()
 

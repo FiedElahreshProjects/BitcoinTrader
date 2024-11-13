@@ -30,7 +30,12 @@ export const TradingDataProvider: React.FC<{children: ReactNode}> = ({children})
     const fetchTradeData = async () => {
         try {
           const response = await axios.get<TradingData[]>(`http://localhost:8000/get_all_trade_data/`);
-          setTradeData(response.data);
+          const sortedData = response.data.sort((a, b) => {
+            const dateA = new Date(a.decision_date);
+            const dateB = new Date(b.decision_date);
+            return dateA < dateB ? -1 : dateA > dateB ? 1 : 0;
+          });
+          setTradeData(sortedData);
         } catch (error) {
           console.error("Error fetching trade data:", error);
         }

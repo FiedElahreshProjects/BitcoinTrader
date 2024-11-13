@@ -81,17 +81,8 @@ export const SentimentPieChart: React.FC<{ formatDate: (date:Date) => string}> =
       // Calculate recent dates on initial load
       useEffect(() => {
         const today = new Date();
-        
-        // Set endDate and selectedDate to yesterday
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 2);
-        
-        // Set startDate to two weeks prior to yesterday
-        const twoWeeksAgo = new Date(yesterday);
-        twoWeeksAgo.setDate(yesterday.getDate() - 14);
-
         // Set the state
-        setSelectedDate(formatDate(yesterday));
+        setSelectedDate(formatDate(today));
     }, []);
   
     useEffect(() => {
@@ -101,7 +92,7 @@ export const SentimentPieChart: React.FC<{ formatDate: (date:Date) => string}> =
     return (
       <div className="w-full h-full flex flex-col items-center justify-center">
         <div className="flex flex-col gap-1 justify-center w-full items-center">
-          <h2 className="text-gray-300 text-xl font-bold">BTC Sentiment</h2>
+          <h2 className="text-gray-300 text-xl xl:text-2xl font-bold mb-1">BTC Sentiment</h2>
           <input
           type="date"
           value={selectedDate}

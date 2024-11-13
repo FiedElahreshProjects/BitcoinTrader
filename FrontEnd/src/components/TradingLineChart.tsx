@@ -73,13 +73,11 @@ export const TradingLineChart: React.FC<{ formatDate: (date: Date) => string }> 
 
   return (
     <div className="w-full h-full flex items-center justify-center gap-6">
-      <div className="flex flex-col gap-1 w-[29%]">
-        <h2 className="text-gray-300 text-xl font-[900]">All BTC Trades</h2>
-        <div className="flex flex-col justify-start text-gray-300 text-sm gap-1"> {/* Default small text */}
-          <p><strong className="font-extrabold">Current Capital:</strong> ${latestCapital.toFixed(2)}</p>
-          <p><strong className="font-extrabold">Average Buy Price:</strong> ${averageBuyPrice.toFixed(2)}</p>
-          <p><strong className="font-extrabold">Last Sell P/L:</strong> ${lastTradeProfitLoss.toFixed(2)}</p>
-        </div>
+      <div className="flex flex-col h-full max-h-[230px] justify-evenly gap-1 w-[29%]">
+        <h2 className="text-gray-300 text-xl md:text-2xl font-[900]">All BTC Trades</h2>
+        <p><strong className="font-extrabold text-gray-300 text-sm xl:text-md">Current Capital:</strong> ${latestCapital.toFixed(2)}</p>
+        <p><strong className="font-extrabold text-gray-300 text-sm xl:text-md">Average Buy Price:</strong> ${averageBuyPrice.toFixed(2)}</p>
+        <p><strong className="font-extrabold text-gray-300 text-sm xl:text-md">Last Sell P/L:</strong> ${lastTradeProfitLoss.toFixed(2)}</p>
       </div>
       <div className="flex items-center justify-center w-[70%] h-full">
         <Line data={chartData} options={options} />

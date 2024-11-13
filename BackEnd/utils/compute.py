@@ -114,7 +114,6 @@ def compute_all(date: datetime) -> TechnicalIndicators:
         values = (date, close, sma_7, sma_21, rsi)
         cursor.execute(query, values)
         result = cursor.fetchone()
-        print(result)
         conn.commit()
     except Exception as e:
         conn.rollback()

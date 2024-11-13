@@ -7,7 +7,7 @@ from BackEnd.utils.compute import compute_all
 
 load_dotenv()
 
-FILE_PATH = 'C:\\Users\\Fied\\Desktop\\tweets.csv'
+FILE_PATH = '/Users/avnoorludhar/Desktop/computer sceince/Project based learning/tweets.csv'
 CHUNK_SIZE = 100000  # Adjust chunk size based on memory limitations
 SKIP_CHUNK = 0
 START_ROW = SKIP_CHUNK * CHUNK_SIZE
@@ -72,7 +72,7 @@ def seed_sentiment_data():
     
     # Define the date range from 2021-02-01 to the end of 2022
     start_date = "2021-12-31"
-    end_date = "2023-06-21"
+    end_date = "2024-11-01"
     date_range = pd.date_range(start=start_date, end=end_date)
 
     # Loop over each date and call compute_all
