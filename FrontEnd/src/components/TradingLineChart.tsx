@@ -32,6 +32,7 @@ export const TradingLineChart: React.FC<{ formatDate: (date: Date) => string }> 
     responsive: true,
     plugins: {
       tooltip: {
+        intersect:false,
         callbacks: {
           label: function (context: any) {
             const trade = tradeData[context.dataIndex];
@@ -46,11 +47,21 @@ export const TradingLineChart: React.FC<{ formatDate: (date: Date) => string }> 
           display: true,
           text: 'Date',
         },
+        ticks: {
+          font: {
+            size: window.innerWidth < 480 ? 8 : 12,
+          },
+        },
       },
       y: {
         title: {
           display: true,
           text: 'Price',
+        },
+        ticks: {
+          font: {
+            size: window.innerWidth < 480 ? 8 : 12,
+          },
         },
       },
     },
@@ -75,7 +86,7 @@ export const TradingLineChart: React.FC<{ formatDate: (date: Date) => string }> 
     <div className="w-full h-full flex md:flex-row flex-col items-center justify-center gap-6 md:min-h-0 min-h-[300px]">
       <div className="flex flex-col h-full max-h-[230px] justify-center md:items-start items-center gap-2 md:w-[29%] w-full">
         <h2 className="text-gray-300 text-xl md:text-2xl font-[900]">All BTC Trades</h2>
-        <div className="flex md:flex-col flex-row flex-wrap items-start md:justify-start justify-evenly md:gap-1 gap-3">
+        <div className="flex md:flex-col flex-row flex-wrap items-start md:justify-start justify-evenly gap-1 ">
           <p><strong className="font-extrabold text-gray-300 text-sm xl:text-md">Current Capital:</strong> ${latestCapital.toFixed(2)}</p>
           <p><strong className="font-extrabold text-gray-300 text-sm xl:text-md">Average Buy Price:</strong> ${averageBuyPrice.toFixed(2)}</p>
           <p><strong className="font-extrabold text-gray-300 text-sm xl:text-md">Last Sell P/L:</strong> ${lastTradeProfitLoss.toFixed(2)}</p>

@@ -106,6 +106,22 @@ export const RSILine: React.FC<{ formatDate: (date: Date) => string }> = ({ form
                 radius: 0, // Set radius to 0 if range > 6 months, else 3
               },
             },
+            scales: {
+                x: {
+                  ticks: {
+                    font: {
+                      size: window.innerWidth < 480 ? 8 : 12,
+                    },
+                  },
+                },
+                y: {
+                  ticks: {
+                    font: {
+                      size: window.innerWidth < 480 ? 8 : 12,
+                    },
+                  },
+                }
+            },
           }}
         />
       </div>

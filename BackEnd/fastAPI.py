@@ -23,11 +23,8 @@ scheduler = BackgroundScheduler()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    try:
-        autonomous_trading_logic()
-        daily_data_collection()
-    except Exception as e:
-        print(e)
+    daily_data_collection()
+    autonomous_trading_logic()
     
     # Schedule the trading logic to run every minute
     scheduler.add_job(autonomous_trading_logic, 'interval', days=1)
