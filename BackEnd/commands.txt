@@ -1,0 +1,4 @@
+uvicorn BackEnd.fastAPI:app
+python3 BackEnd.seeding.seed_database.py
+python3 BackEnd.seeding.seed_model.py
+npm i --save-dev @types/node

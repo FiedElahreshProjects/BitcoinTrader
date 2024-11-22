@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 from dotenv import load_dotenv
-from BackEnd.utils.sentiment_utils import calculate_sentiment_wscore
+from BackEnd.utils.sentiment_utils import calculate_sentiment
 from BackEnd.utils.compute import compute_all
 
 
@@ -59,7 +59,7 @@ def load_sentiment():
             # Process sentiment analysis
             if posts:
                 try:
-                    sentiment_score = calculate_sentiment_wscore(posts)
+                    sentiment_score = calculate_sentiment(posts)
                     print(f"Sentiment for {date}: {sentiment_score}")
                 except Exception as e:
                     print(e)
@@ -71,7 +71,7 @@ def seed_sentiment_data():
     load_sentiment()
     
     # Define the date range from 2021-02-01 to the end of 2022
-    start_date = "2021-12-31"
+    start_date = "2021-01-01"
     end_date = "2024-11-01"
     date_range = pd.date_range(start=start_date, end=end_date)
 

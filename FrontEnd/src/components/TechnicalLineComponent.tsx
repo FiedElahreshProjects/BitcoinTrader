@@ -19,6 +19,8 @@ type ChartData = {
   }[];
 }
 
+const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
+
 export const TechnicalLineChart: React.FC<{ formatDate: (date: Date) => string }> = ({ formatDate }) => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
@@ -40,7 +42,7 @@ export const TechnicalLineChart: React.FC<{ formatDate: (date: Date) => string }
   const getTechnicalData = async () => {
     if (startDate && endDate) {
       try {
-        const response = await axios.post<TechnicalData[]>(`http://localhost:8000/daily-technical-by-date/`, { date_start: startDate, date_end: endDate });
+        const response = await axios.post<TechnicalData[]>(`${API_URL}/daily-technical-by-date/`, { date_start: startDate, date_end: endDate });
         const sortedData = response.data.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);

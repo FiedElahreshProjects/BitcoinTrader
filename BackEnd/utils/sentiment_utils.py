@@ -54,7 +54,7 @@ def calculate_sentiment(posts: List[RedditPost]):
         RETURNING *;
         """
         values = (
-            posts[-1]['created'],  # Access created date using dot notation
+            posts[-1]['created'], 
             weighted_compound_score,
             weighted_positive_score,
             weighted_neutral_score,
@@ -66,7 +66,7 @@ def calculate_sentiment(posts: List[RedditPost]):
         conn.commit()
     except Exception as e:
         conn.rollback()
-        raise Exception(f"Failed to store sentiment score: {e}")
+        print(f"Failed to store sentiment score: {e}")
     finally:
         cursor.close()
         conn.close()

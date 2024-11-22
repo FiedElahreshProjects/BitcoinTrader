@@ -18,6 +18,8 @@ interface ChartData {
   }[];
 }
 
+const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
+
 export const SentimentPieChart: React.FC<{ formatDate: (date:Date) => string}> = ({ formatDate }) => {
     const [selectedDate, setSelectedDate] = useState<string>('');
     const [chartData, setChartData] = useState<ChartData>({
@@ -48,7 +50,7 @@ export const SentimentPieChart: React.FC<{ formatDate: (date:Date) => string}> =
       const getDate = async () =>{
         if(selectedDate){
           try{
-            const { data } = await axios.post<SentimentData>(`http://localhost:8000/daily-sentiment-by-date/`, {date: selectedDate})
+            const { data } = await axios.post<SentimentData>(`${API_URL}/daily-sentiment-by-date/`, {date: selectedDate})
     
             setChartData({
               labels: ['Positive', 'Neutral', 'Negative'],
@@ -81,7 +83,6 @@ export const SentimentPieChart: React.FC<{ formatDate: (date:Date) => string}> =
       // Calculate recent dates on initial load
       useEffect(() => {
         const today = new Date();
-        // Set the state
         setSelectedDate(formatDate(today));
     }, []);
   

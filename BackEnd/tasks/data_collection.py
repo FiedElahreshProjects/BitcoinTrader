@@ -41,7 +41,6 @@ def daily_data_collection():
 
     reddit_data_analysis()
 
-    # Fetch the data once
     try:
         compute_all(datetime.today())
     except Exception as e:

@@ -2,11 +2,19 @@ from fastapi import APIRouter, HTTPException, Query
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from pydantic import BaseModel
 from typing import List
-from datetime import date
+from datetime import date, datetime
 from BackEnd.database.database import get_connection
+import praw
+import os
 
 # Create a router instance for the sentiment endpoints
 router = APIRouter()
+
+reddit = praw.Reddit(
+    client_id=os.getenv("CLIENT_ID"),
+    client_secret=os.getenv("CLIENT_SECRET"),
+    user_agent=os.getenv("USER_AGENT")
+)
 
 # Define the Pydantic model for request validation
 class DailySentiment(BaseModel):
@@ -136,53 +144,24 @@ def get_daily_sentiments():
     return results
 
 
+@router.get("/reddit-posts/")
+def get_latest_reddit_posts(subreddit: str = Query(..., description="Subreddit name to fetch posts from")):
+    subreddit_obj = reddit.subreddit(subreddit)  # Use the user-specified subreddit
+    posts = []
 
-# class DateRequest(BaseModel):
-#     date_start: date
-#     date_end: date
+    # Get current time in UNIX timestamp and calculate the time for 7 days ago
+    current_time = int(time.time())  # Current time in UNIX timestamp
+    seven_days_ago = current_time - (7 * 24 * 60 * 60)  # Subtract 7 days (in seconds)
 
-# class TechnicalData(BaseModel):
-#     date: date
-#     closing_price: float
-#     sma_7: float
-#     sma_21: float
-#     rsi: float
+    # Fetch the latest 100 posts from the specified subreddit
+    for post in subreddit_obj.new(limit=1100):
+        # Filter only posts created in the last 7 days
+        if post.created_utc >= seven_days_ago:
+            posts.append({
+                "title": post.title,
+                "body": post.selftext,
+                "created": datetime.utcfromtimestamp(post.created_utc).strftime('%Y-%m-%d'),
+                "score": post.score,
+            })
 
-# @router.post("/daily-technical-by-date/", response_model=List[TechnicalData])
-# def get_daily_technical_by_date(date_request: DateRequest):
-#     date_start = date_request.date_start
-#     date_end = date_request.date_end
-#     conn = get_connection()
-#     cursor = conn.cursor()
-#     try:
-#         query = """
-#             SELECT date, closing_price, sma_7, sma_21, rsi 
-#             FROM daily_technical_analysis 
-#             WHERE date >= %s AND date <= %s
-#         """
-#         cursor.execute(query, (date_start, date_end))
-#         results = cursor.fetchall()
-
-#         if not results:
-#             raise HTTPException(status_code=404, detail="No technical data found for the given date range")
-
-#         # Map each result to a TechnicalData instance
-#         technical_data_list = [
-#             TechnicalData(
-#                 date=row['date'],
-#                 closing_price=row['closing_price'],
-#                 sma_7=row['sma_7'],
-#                 sma_21=row['sma_21'],
-#                 rsi=row['rsi']
-#             )
-#             for row in results
-#         ]
-
-#         return technical_data_list
-
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Server Error: {str(e)}")
-    
-#     finally:
-#         cursor.close()
-#         conn.close()
+    return {"posts": posts}

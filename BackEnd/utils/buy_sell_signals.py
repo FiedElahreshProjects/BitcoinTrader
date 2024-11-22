@@ -6,10 +6,6 @@ def get_technical_trade_signal(technical_data):
     sma_7_current = technical_data['sma_7'].iloc[-1]
     sma_21_current = technical_data['sma_21'].iloc[-1]
     
-    # # Get previous day SMA values to detect a crossover
-    # sma_7_previous = technical_data['sma_7'].iloc[-2]
-    # sma_21_previous = technical_data['sma_21'].iloc[-2]
-    
     # Calculate more sensitive RSI thresholds
     buy_rsi_threshold = 48  # Increased sensitivity for buy signals
     sell_rsi_threshold = 52  # Increased sensitivity for sell signals
@@ -47,13 +43,12 @@ def get_sentiment_trade_signal(sentiment_data):
     z_score = (latest_sentiment - mean_sentiment) / std_dev_sentiment
     
     # Define extremely sensitive thresholds for buy and sell signals
-    buy_z_threshold = 0.25  # Very sensitive threshold for buy signals
-    sell_z_threshold = -0.25  # Very sensitive threshold for sell signals
+    buy_z_threshold = 0.25
+    sell_z_threshold = -0.25
 
-    # Determine trade signal based on highly sensitive thresholds
     if latest_sentiment > upper_band and z_score >= buy_z_threshold:
-        return 'buy'  # Buy on slight positive sentiment
+        return 'buy'
     elif latest_sentiment < lower_band and z_score <= sell_z_threshold:
-        return 'sell'  # Sell on slight negative sentiment
+        return 'sell' 
     else:
         return 'hold'
