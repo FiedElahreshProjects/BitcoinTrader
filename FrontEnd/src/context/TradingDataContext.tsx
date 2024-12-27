@@ -18,6 +18,8 @@ type TradingDataContextType = {
     fetchTradeData: () => void;
 }
 
+const API_URL = import.meta.env.VITE_REACT_APP_API_URL;
+
 //defines a global container that will hold the shared state and any functions
 //provides structure like an empty room that react will use to store the actual data
 const TradingDataContext = createContext<TradingDataContextType | undefined>(undefined);
@@ -29,7 +31,7 @@ export const TradingDataProvider: React.FC<{children: ReactNode}> = ({children})
 
     const fetchTradeData = async () => {
         try {
-          const response = await axios.get<TradingData[]>(`http://localhost:8000/get_all_trade_data/`);
+          const response = await axios.get<TradingData[]>(`${API_URL}/get_all_trade_data/`);
           const sortedData = response.data.sort((a, b) => {
             const dateA = new Date(a.decision_date);
             const dateB = new Date(b.decision_date);

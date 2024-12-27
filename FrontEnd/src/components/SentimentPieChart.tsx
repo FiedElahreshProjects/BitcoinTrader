@@ -82,8 +82,9 @@ export const SentimentPieChart: React.FC<{ formatDate: (date:Date) => string}> =
       };
       // Calculate recent dates on initial load
       useEffect(() => {
-        const today = new Date();
-        setSelectedDate(formatDate(today));
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1); // Subtract 1 day
+        setSelectedDate(formatDate(yesterday));
     }, []);
   
     useEffect(() => {
