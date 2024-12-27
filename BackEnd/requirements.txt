@@ -6,5 +6,6 @@ pandas
 vaderSentiment
 pydantic
 alpaca-trade-api
+alpaca-py
 apscheduler
 praw

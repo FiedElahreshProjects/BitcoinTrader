@@ -4,3 +4,7 @@ python3 -m BackEnd.seeding.seed_model
 npm i --save-dev @types/node
 
 scp -v -i ./BitcoinTrader.pem ./tweets.csv ubuntu@18.222.168.118:~/
+source venv/bin/activate
+uvicorn BackEnd.fastAPI:app --host 0.0.0.0 --port 8000
+
+NOTE: aws maps the public IP to the private IP hence the AWS public IP is not actually assigned to a netowrk interface on our instance.
