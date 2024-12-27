@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+psycopg2-binary
+python-dotenv
+pandas
+vaderSentiment
+pydantic
+alpaca-trade-api
+apscheduler
+praw

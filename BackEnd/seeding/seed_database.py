@@ -47,7 +47,7 @@ def load_sentiment():
                     'title': '',
                     'body': row.get('text', ''),
                     'created': date,
-                    'score': 0 # Assuming retweets act as score
+                    'score': row.get('like_count', 0) + row.get('reply_count', 0) + row.get('retweet_count', 0) + row.get('quote_count', 0)
                 })
 
             
@@ -72,7 +72,7 @@ def seed_sentiment_data():
     
     # Define the date range from 2021-02-01 to the end of 2022
     start_date = "2021-01-01"
-    end_date = "2024-11-01"
+    end_date = "2024-12-26"
     date_range = pd.date_range(start=start_date, end=end_date)
 
     # Loop over each date and call compute_all

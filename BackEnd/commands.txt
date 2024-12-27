@@ -1,4 +1,6 @@
 uvicorn BackEnd.fastAPI:app
-python3 BackEnd.seeding.seed_database.py
-python3 BackEnd.seeding.seed_model.py
+python3 -m BackEnd.seeding.seed_database
+python3 -m BackEnd.seeding.seed_model
 npm i --save-dev @types/node
+
+scp -v -i ./BitcoinTrader.pem ./tweets.csv ubuntu@18.222.168.118:~/
