@@ -35,6 +35,8 @@ def calculate_sentiment(posts: List[RedditPost]):
         weighted_negative_scores.append(negative_score * post['score'])
         total_reddit_score += post['score']
 
+        print(post['score'])
+
     # Calculate the weighted average for each score
     if total_reddit_score > 0:
         weighted_compound_score = sum(weighted_compound_scores) / total_reddit_score
@@ -54,7 +56,7 @@ def calculate_sentiment(posts: List[RedditPost]):
         RETURNING *;
         """
         values = (
-            posts[-1]['created'], 
+            date.today(), 
             weighted_compound_score,
             weighted_positive_score,
             weighted_neutral_score,

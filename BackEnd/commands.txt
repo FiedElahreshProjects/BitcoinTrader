@@ -3,8 +3,39 @@ python3 -m BackEnd.seeding.seed_database
 python3 -m BackEnd.seeding.seed_model
 npm i --save-dev @types/node
 
+ssh -i BitcoinTrader.pem ubuntu@18.222.168.118
 scp -v -i ./BitcoinTrader.pem ./tweets.csv ubuntu@18.222.168.118:~/
 source venv/bin/activate
 uvicorn BackEnd.fastAPI:app --host 0.0.0.0 --port 8000
 
+
+NGINX:
+sudo vim /etc/nginx/sites-available/BitcoinTrader
+sudo ln -s /etc/nginx/sites-available/BitcoinTrader /etc/nginx/sites-enabled/
+sudo systemctl daemon-reload
+sudo systemctl restart nginx
+sudo nginx -t
+sudo systemctl status nginx
+
+SYSTEMD:
+sudo vim /etc/systemd/system/BitcoinTrader.service
+sudo systemctl restart BitcoinTrader
+sudo systemctl enable BitcoinTrader
+#checks the logs of the nginx service
+sudo journalctl -u nginx.service
+#checks the log for the fastapi application
+sudo journalctl -u BitcoinTrader.service -f
+#checks status of running process
+sudo systemctl status BitcoinTrader
+
+CERTBOT
+
+sudo certbot --nginx -d bitcointraders.ca -d www.bitcointraders.ca
+
+
 NOTE: aws maps the public IP to the private IP hence the AWS public IP is not actually assigned to a netowrk interface on our instance.
+
+sites-available: is all the configurations available by nginx
+sites-enabled: all the ones that will actually be used.
+systemd: handles daemon processes on the computer.
+
